@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#b9782f" />
+  <meta name="description" content="Hannibal - Tunisian-history endless runner for Pi Browser and Netlify." />
+  <title>HANNIBAL</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23573422'/%3E%3Cpath d='M12 50c0-14 7-25 19-29 10-3 20 1 25 11 4 1 7 5 7 9 0 5-4 9-9 9h-4c-4 7-10 10-18 10C18 60 12 56 12 50Z' fill='%23e7cb97'/%3E%3Cpath d='M45 36c1 7-3 12-8 16' stroke='%23312016' stroke-width='3.5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='37' cy='28' r='2.4' fill='%23312016'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <script>
+    window.__HANNIBAL_FIREBASE__ = window.__HANNIBAL_FIREBASE__ || null;
+  </script>
+
+  <div id="bootOverlay" class="boot-overlay">
+    <section id="splashScreen" class="splash-screen active">
+      <div class="splash-seal">𐤇</div>
+      <div class="splash-title">HANNIBAL</div>
+      <div class="splash-line" data-i18n="splashLine">Forge your legend on the roads of Carthage.</div>
+    </section>
+    <section id="loadingScreen" class="loading-screen">
+      <div class="loading-card">
+        <div class="loading-title">HANNIBAL</div>
+        <div class="loading-subtitle" data-i18n="loading">Loading…</div>
+        <div class="loading-bar"><div id="loadingFill" class="loading-fill"></div></div>
+        <div id="loadingText" class="loading-text">Loading…</div>
+      </div>
+    </section>
+  </div>
+
+  <div id="app" class="app-shell">
+    <header class="topbar stone-panel">
+      <div class="brand-wrap">
+        <div class="brand-icon">🐘</div>
+        <div>
+          <div class="brand-title">HANNIBAL</div>
+          <div class="brand-subtitle" data-i18n="tagline">Run the sacred road, gather the gold.</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="langToggle" class="icon-btn" aria-label="Language">AR</button>
+        <button id="soundToggle" class="icon-btn" aria-label="Sound">🔊</button>
+      </div>
+    </header>
+
+    <main class="screen-stack">
+      <section id="homeScreen" class="screen active">
+        <div class="hero-card stone-panel card-pad">
+          <div class="hero-art"></div>
+          <div class="hero-kicker" data-i18n="heroKicker">Tunisian-history endless runner</div>
+          <h1 class="hero-title" data-i18n="heroTitle">Charge with Hannibal</h1>
+          <p class="hero-text" data-i18n="heroText">Dash through Carthaginian ruins, dodge obstacles, and collect coins hurled by your loyal elephant companion.</p>
+
+          <div class="wallet-card subtle-panel">
+            <div>
+              <div class="small-label" data-i18n="walletTitle">Pi Wallet</div>
+              <div id="walletStatus" class="wallet-status" data-i18n="walletGuest">Guest mode</div>
+            </div>
+            <div class="wallet-balance-wrap">
+              <div class="small-label" data-i18n="walletBalance">Balance</div>
+              <div id="walletBalance" class="wallet-balance">0.00 π</div>
+            </div>
+          </div>
+
+          <div class="home-stats">
+            <div class="stat-box subtle-panel">
+              <span class="small-label" data-i18n="bestScore">Best Score</span>
+              <strong id="bestScoreValue">0</strong>
+            </div>
+            <div class="stat-box subtle-panel">
+              <span class="small-label" data-i18n="bestRun">Best Run</span>
+              <strong id="bestDistanceValue">0m</strong>
+            </div>
+            <div class="stat-box subtle-panel">
+              <span class="small-label" data-i18n="coinsBank">Coins Bank</span>
+              <strong id="coinsBankValue">0</strong>
+            </div>
+          </div>
+
+          <div class="primary-actions">
+            <button id="startBtn" class="btn btn-primary" data-i18n="playNow">Play Now</button>
+            <button id="piLoginBtn" class="btn btn-secondary" data-i18n="loginWithPi">Login with Pi</button>
+          </div>
+
+          <div class="secondary-actions">
+            <button id="leaderboardBtn" class="btn btn-ghost" data-i18n="leaderboard">Leaderboard</button>
+            <button id="settingsBtn" class="btn btn-ghost" data-i18n="settings">Settings</button>
+          </div>
+        </div>
+
+        <div class="tips-row stone-panel card-pad">
+          <div class="tip-chip">⬅️➡️ <span data-i18n="tipLane">Swipe left/right to change lanes</span></div>
+          <div class="tip-chip">⬆️ <span data-i18n="tipJump">Swipe up to jump</span></div>
+          <div class="tip-chip">⬇️ <span data-i18n="tipSlide">Swipe down to slide</span></div>
+          <div class="tip-chip">📱 <span data-i18n="tipTilt">Tilt left/right to steer</span></div>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen game-screen">
+        <div class="hud stone-panel">
+          <div class="hud-block">
+            <span class="small-label" data-i18n="score">Score</span>
+            <strong id="hudScore">0</strong>
+          </div>
+          <div class="hud-block">
+            <span class="small-label" data-i18n="coins">Coins</span>
+            <strong id="hudCoins">0</strong>
+          </div>
+          <div class="hud-block">
+            <span class="small-label" data-i18n="speed">Speed</span>
+            <strong id="hudSpeed">1.0x</strong>
+          </div>
+          <div class="hud-block env-block">
+            <span class="small-label" data-i18n="environment">Environment</span>
+            <strong id="hudEnvironment">Byrsa Heights</strong>
+          </div>
+        </div>
+
+        <div class="status-strip stone-panel">
+          <div id="powerStatus" class="status-pill hidden">Shield</div>
+          <div id="elephantStatus" class="elephant-status" data-i18n="elephantReady">Elephant ready</div>
+          <div id="tiltStatus" class="tilt-status" data-state="idle" data-i18n="tiltGuide">Tilt steering</div>
+          <button id="pauseToHomeBtn" class="text-btn" data-i18n="quit">Quit</button>
+        </div>
+
+        <canvas id="gameCanvas" aria-label="Hannibal game canvas"></canvas>
+
+        <div id="touchGuide" class="touch-guide stone-panel">
+          <span data-i18n="touchGuide">Swipe anywhere on the arena</span>
+        </div>
+
+        <div id="gameOverOverlay" class="overlay hidden">
+          <div class="overlay-card stone-panel card-pad">
+            <div class="hero-kicker" data-i18n="gameOver">Run Ended</div>
+            <h2 id="finalScoreTitle" class="overlay-title">0</h2>
+            <p id="finalRunMeta" class="overlay-text">0m • 0 coins</p>
+            <div class="overlay-actions">
+              <button id="restartBtn" class="btn btn-primary" data-i18n="playAgain">Play Again</button>
+              <button id="homeBtnFromGame" class="btn btn-secondary" data-i18n="home">Home</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="leaderboardScreen" class="screen panel-screen">
+        <div class="panel stone-panel card-pad">
+          <div class="panel-head">
+            <div>
+              <div class="hero-kicker" data-i18n="topPlayers">Top Players</div>
+              <h2 class="panel-title" data-i18n="leaderboard">Leaderboard</h2>
+            </div>
+            <button class="icon-btn back-btn" data-target="home" aria-label="Back">←</button>
+          </div>
+          <div id="leaderboardList" class="leaderboard-list"></div>
+        </div>
+      </section>
+
+      <section id="settingsScreen" class="screen panel-screen">
+        <div class="panel stone-panel card-pad">
+          <div class="panel-head">
+            <div>
+              <div class="hero-kicker" data-i18n="preferences">Preferences</div>
+              <h2 class="panel-title" data-i18n="settings">Settings</h2>
+            </div>
+            <button class="icon-btn back-btn" data-target="home" aria-label="Back">←</button>
+          </div>
+
+          <div class="settings-list">
+            <div class="setting-row subtle-panel">
+              <div>
+                <strong data-i18n="language">Language</strong>
+                <p data-i18n="languageDesc">Switch between Arabic and English.</p>
+              </div>
+              <button id="settingsLangBtn" class="btn btn-ghost small-btn">AR / EN</button>
+            </div>
+            <div class="setting-row subtle-panel">
+              <div>
+                <strong data-i18n="sound">Sound</strong>
+                <p data-i18n="soundDesc">Music and effects on/off.</p>
+              </div>
+              <button id="settingsSoundBtn" class="btn btn-ghost small-btn" data-i18n="toggle">Toggle</button>
+            </div>
+            <div class="setting-row subtle-panel">
+              <div>
+                <strong data-i18n="progressSync">Progress Sync</strong>
+                <p data-i18n="firebaseDesc">Uses Firebase when config is available, otherwise safe local storage.</p>
+              </div>
+              <span id="syncStatus" class="sync-badge">Local</span>
+            </div>
+            <div class="setting-row subtle-panel">
+              <div>
+                <strong data-i18n="resetProgress">Reset Progress</strong>
+                <p data-i18n="resetDesc">Clear local game stats and cached scores.</p>
+              </div>
+              <button id="resetProgressBtn" class="btn btn-danger small-btn" data-i18n="reset">Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
